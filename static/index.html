@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+    <title>Demo</title>
+
+    <style>
+        html, body {
+            color: #d3d3d3;
+            font: 12pt arial;
+            background-color: #222222;
+            height: 100%;
+            margin: 0px;
+        }
+
+        #graph {
+            width: 79.5%;
+            height: 99%;
+            border: 1px solid #444444;
+            background-color: #222222;
+            float: left;
+        }
+
+        #right-toolbox {
+            width: 19.5%;
+            height: 99%;
+            float: right;
+        }
+
+        #state-msg {
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(50,50,50);
+            background-color: rgba(50,50,50,0.4);
+        }
+
+        #state-msg-content {
+            background-color: #333;
+            font-size: large;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #60b48a;
+            color: #60b48a;
+            width: 80%;
+        }
+
+        .vis-tooltip {
+            font-size: large !important;
+        }
+
+        a {
+            color: #60b48a;
+        }
+
+        a:hover {
+            color: #72d5a3;
+        }
+    </style>
+
+    <script type="text/javascript" src="vis.js"></script>
+    <link href="vis-network.min.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div id="state-msg">
+    <div id="state-msg-content">Loading…</div>
+</div>
+<div id="graph"></div>
+<div id="right-toolbox">
+</div>
+<script type="text/javascript">
+    var network = null;
+    var container = document.getElementById('graph');
+    var data = {
+        nodes: new vis.DataSet([]),
+        edges: new vis.DataSet([]),
+    };
+    var options = {
+        nodes: {
+            shape: 'dot',
+            size: 30,
+            font: {
+                size: 26,
+                color: '#ffffff',
+            },
+            borderWidth: 2,
+        },
+        physics: {
+        },
+        interaction: {
+            hover: true,
+        },
+    };
+
+    var tb = document.getElementById('right-toolbox');
+    var VCaptions;
+    var since_v;
+    var since_e;
+
+    function clear() {
+        tb.innerHTML = '<span style="color: #999999;">Click on a node or an edge.</span>';
+        data.nodes.clear();
+        data.edges.clear();
+        VCaptions = {};
+        since_v = 0;
+        since_e = 0;
+    }
+    clear();
+
+    function gen_edge_id(From, To) {
+        return 'e' + From + '_' + To;
+    }
+
+    function parse_edge_id(EdgeID) {
+        var m = EdgeID.match(/^e([0-9]+)_([0-9]+)$/);
+        return {
+            from: parseInt(m[1], 10),
+            to:   parseInt(m[2], 10),
+        };
+    }
+
+    function alter_node_value(NodeID, Delta) {
+        console.log('alter_node_value', NodeID, Delta);
+        var value = data.nodes.get(NodeID).value + Delta;
+        var title = VCaptions[NodeID];
+        data.nodes.update({
+            id:    NodeID,
+            value: value,
+            title: gen_node_title(value, title, false),
+        });
+    }
+
+    function set_state_msg(msg) {
+        var elem = document.getElementById('state-msg');
+        if (msg === null) {
+            elem.style.display = 'none';
+        } else {
+            elem.style.display = 'block';
+            document.getElementById('state-msg-content').innerHTML = msg;
+        }
+    }
+
+    function node_clicked(NodeID) {
+        var value = data.nodes.get(NodeID).value;
+        var title = VCaptions[NodeID];
+        tb.innerHTML = gen_node_title(value, title, true);
+    }
+
+    function edge_clicked(EdgeID) {
+        tb.innerHTML = 'Loading…';
+
+        var e = parse_edge_id(EdgeID);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/get-edge-titles?from=' + e.from + '&to=' + e.to, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) {
+                return;
+            }
+            if (xhr.status != 200) {
+                tb.innerHTML = 'Error ' + xhr.status;
+                return;
+            }
+            var R = JSON.parse(xhr.responseText);
+            tb.innerHTML = '<b>Transactions</b>:<ul><li>' + R.join('<li>') + '</ul>';
+        }
+        xhr.send();
+    }
+
+    function create_network() {
+        network = new vis.Network(container, data, options);
+        network.on('click', function (params) {
+            var NodeID = this.getNodeAt(params.pointer.DOM);
+            if (NodeID !== undefined) {
+                node_clicked(NodeID);
+            } else {
+                var EdgeID = this.getEdgeAt(params.pointer.DOM);
+                if (EdgeID !== undefined) {
+                    edge_clicked(EdgeID);
+                }
+            }
+        });
+    }
+
+    function gen_node_title(X, T, isFull) {
+        if (isFull) {
+            return '<b>Address</b>: ' + T + '<br/><b>Balance</b>: ' + X + ' FTM';
+        } else {
+            return                      T + '<br/><b>Balance</b>: ' + X + ' FTM';
+        }
+    }
+
+    function gen_edge_title(X) {
+        return '<b>Total amount</b>: ' + X + ' FTM';
+    }
+
+    var epoch = null;
+
+    function update() {
+        if (epoch === null) {
+            return;
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/get-graph?epoch=' + epoch + '&since_v=' + since_v + '&since_e=' + since_e, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) {
+                return;
+            }
+            if (xhr.status != 200) {
+                if (xhr.status == 418) {
+                    set_state_msg('New epoch, loading…');
+                    epoch = null;
+                    update_epoch();
+                } else {
+                    set_state_msg('Error ' + xhr.status + ', reconnecing…');
+                }
+                clear();
+                return;
+            }
+            set_state_msg(null);
+
+            var G = JSON.parse(xhr.responseText);
+
+            for (var i = 0; i < G.vertices.length; ++i) {
+                var V = G.vertices[i];
+                var ID = since_v + i;
+                var caption = V[2];
+                VCaptions[ID] = caption;
+                data.nodes.add({
+                    id:    since_v + i,
+                    value: V[0],
+                    group: V[1],
+                    title: gen_node_title(V[0], caption, false),
+                });
+            }
+            for (var i = 0; i < G.edges.length; ++i) {
+                var E = G.edges[i];
+
+                var ID = gen_edge_id(/*from*/ E[0], /*to*/ E[1]);
+                var O = data.edges.get(ID);
+                if (O === null) {
+                    console.log('add edge', E);
+                    data.edges.add({
+                        id:    ID,
+                        from:  E[0],
+                        to:    E[1],
+                        value: E[2],
+                        title: gen_edge_title(E[2]),
+                    });
+                } else {
+                    var value = O.value + E[2];
+                    data.edges.update({
+                        id:    ID,
+                        title: gen_edge_title(value),
+                        value: value,
+                    });
+
+                }
+
+                alter_node_value(/*from*/ E[0], -E[2]);
+                alter_node_value(/*to*/   E[1], +E[2]);
+            }
+
+            if (
+                since_v == 0 &&
+                since_e == 0 &&
+                (G.vertices.length != 0 ||
+                 G.edges.length != 0))
+            {
+                create_network();
+            }
+
+            since_v += G.vertices.length;
+            since_e += G.edges.length;
+        };
+
+        xhr.send();
+    }
+
+    setInterval(update, 500);
+
+    function update_epoch() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/get-epoch', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) {
+                return;
+            }
+            if (xhr.status != 200) {
+                set_state_msg('Error ' + xhr.status + ', reconnecting…');
+                clear();
+                setTimeout(update_epoch, 1000);
+                return;
+            }
+            set_state_msg(null);
+
+            var R = JSON.parse(xhr.responseText);
+            epoch = R.epoch;
+        }
+
+        xhr.send();
+    }
+
+    update_epoch();
+
+</script>
+</body>
+</html>
