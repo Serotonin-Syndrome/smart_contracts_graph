@@ -58,6 +58,13 @@ Run `./main.py` to start the server; it works on the 8080 port. Then go to http:
 
 * Run `./test1.sh` to run the automated test.
 
-# Team
+# Launching the site locally
+```
+docker build -t fantom-simulator .
+docker run -p 80:8096 -p 8080:8080 -d fantom-simulator
+```
 
-Zeeshan Yousaf, Igor Evdokimov and others.
+# Team
+<b>Zeeshan Yousaf</b>, <b>Igor Evdokimov</b> and others.
+
+<img src="/img/Fin.png">
