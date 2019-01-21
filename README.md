@@ -11,8 +11,11 @@ So, the main idea of my solution is to show how smart contract changes the netwo
 
 It is important not only for developers, but also for users, because with my solution anyone will be able to check and ensure that everything works correctly and the system is safe.
 
-That is how my solution looks like right now:
+That is how my solution looks like right now, and you can see the <a href="https://youtu.be/r4JFkFgU8p0"> LIVE DEMO </a>:
 <img src="img/MainPicture.png">
+You can also check it on the web site <a href="http://209.97.131.179:8096"> http://209.97.131.179:8096 </a>
+
+
 Below you can find an explanation of every single part of this infrastructure.
 
 # Explanation
@@ -65,7 +68,7 @@ docker run -p 80:8096 -p 8080:8080 -d fantom-simulator
 ```
 
 # Team
-<b>Zeeshan Yousaf</b>, <b>Igor Evdokimov</b> and others.
+<b>Igor Evdokimov</b>, <b>Zeeshan Yousaf</b> and others.
 
 <img src="/img/Fin.png">
 *Different smart contracts with their impacts on the network resultant*
