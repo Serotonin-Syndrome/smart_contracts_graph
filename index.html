@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" type="image/png" sizes="32x32" href="fantom-favicon.png"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900"/>
+    <link rel="stylesheet" href="styles.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+</head>
+
+<body>
+<div id="header">
+    <img src="fantom-logo-3.png">
+    <span>Smart contract simulator</span>
+</div>
+
+<div id="global-container">
+    <div id="code-container">
+        <div id="code-left" class="side-code">
+            <div class="interface-header">Smart Contract</div>
+            <div id="editor-left" class="side-editor"></div>
+        </div>
+        <div id="demo-list">
+            <div class="interface-header">See demos</div>
+            <div class="button demo-button" data-demoid="2">Demo 1</div>
+            <div class="button demo-button" data-demoid="3">Demo 2</div>
+            <div class="button demo-button" data-demoid="4">Demo 3</div>
+        </div>
+        <div id="code-right" class="side-code">
+            <div class="interface-header">Tests</div>
+            <div id="editor-right" class="side-editor"></div>
+        </div>
+    </div>
+    <div id="controls-container">
+        <div id="tools">
+            <div class="button simulate-button">Simulate</div>
+        </div>
+    </div>
+</div>
+
+<script src="main.js"></script>
+
+</body>
+
+</html>
