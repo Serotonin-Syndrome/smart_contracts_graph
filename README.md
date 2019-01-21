@@ -1,4 +1,4 @@
-Hello, this is my solution for the Crypto Bazar Serial Hackathon.
+## Hello, this is my solution for the Crypto Bazar Serial Hackathon.
 Task I have solved is from Fantom project: a simulator for smart contracts to show how a network will change after the deployment.
 
 Let’s see what I've done!
@@ -20,7 +20,7 @@ My solution is a web site, which allows develop and test smart contracts for the
 
 First of all, you need to write your own smart contract and some tests for them. You also can choose a standard one. After that, you can go on my web site and paste code in the left part of the page and tests in the right part.
 
-<img src="img/CodeTestPage.jpeg">
+<img src="img/CodeTestPage.png">
 
 Finally, you just need to click *Simulate smart contract execution* button, and see the result! All the logs, errors and exceptions can be seen in the terminal below the code and the resultant network with real-time execution will be opened in the new tab.
 
@@ -42,9 +42,8 @@ All the edges and vertices are clickable and contain information about themselve
 To install and test all the code locally, use this guide.
 First of all, clone the source code:
 ```
-git clone 
+git clone https://gitlab.com/doushiyou/dns.git
 ```
-# ВСТАВИТЬ ССЫЛКУ
 Then, you need to install the requirements:
 
 ```
@@ -58,3 +57,7 @@ Run `./main.py` to start the server; it works on the 8080 port. Then go to http:
 * Run `./demo2.py`, `./demo3.py`, or `./demo4.py` to run the graph demos.
 
 * Run `./test1.sh` to run the automated test.
+
+# Team
+
+Zeeshan Yousaf, Igor Evdokimov and others.
