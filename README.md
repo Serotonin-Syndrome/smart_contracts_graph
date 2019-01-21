@@ -68,3 +68,4 @@ docker run -p 80:8096 -p 8080:8080 -d fantom-simulator
 <b>Zeeshan Yousaf</b>, <b>Igor Evdokimov</b> and others.
 
 <img src="/img/Fin.png">
+*Different smart contracts with their impacts on the network resultant*
