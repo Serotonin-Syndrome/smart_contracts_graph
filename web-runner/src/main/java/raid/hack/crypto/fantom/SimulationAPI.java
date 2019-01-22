@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class SimulationAPI {
 
   private ExecutionResponse execute(String... params) {
     List<String> cmd = new ArrayList<>();
-    cmd.add("python");
+    cmd.add("python3");
 //    List<String> cmd = Arrays.asList("sudo", "-u", "unsafe", "python");
     Collections.addAll(cmd, params);
     try {

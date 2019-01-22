@@ -1,10 +1,19 @@
-const CLIENT_COMPATIBILITY = "0.1.0"
+const CLIENT_COMPATIBILITY = "0.1.2";
 
 const LAST_COMPATIBILITY = localStorage.getItem("client_compatibility")
 if (CLIENT_COMPATIBILITY != LAST_COMPATIBILITY) {
     localStorage.clear();
     localStorage.setItem("client_compatibility", CLIENT_COMPATIBILITY)
 }
+
+examples = {
+    "contract": {
+        "code": "class MyContract:\n    def __init__(self, testnet, creator_addr, my_addr, amount):\n        self._testnet = testnet\n\n    def ping(self, who, amount):\n        self._testnet.pay(who, amount)\n"
+    },
+    "tests": {
+        "code": "import os\nfrom time import sleep\n\n\ndef run_tests(generators, TestNet, MyContract):\n    use_delays = not bool(os.getenv('PleaseNoDelays'))\n\n    creator_addr = generators.gen_addr()\n    contract_addr = generators.gen_addr()\n    users = [generators.gen_addr() for _ in range(7)]\n\n    balances = {creator_addr: 2001}\n    for user in users:\n        balances[user] = 952\n\n    testnet = TestNet(balances)\n    testnet.deploy(MyContract, contract_addr=contract_addr, creator_addr=creator_addr, amount=10)\n    if use_delays:\n        print('Please switch to the browser and press ENTER when ready for the demo:')\n        input()\n        sleep(1)\n    for user in users:\n        for i in range(3):\n            testnet.call_method('ping', user, i + 1, ())"
+    }
+};
 
 function initEditor(id) {
     let editor = ace.edit(id);
@@ -19,31 +28,16 @@ function initEditor(id) {
         let code = editor.getValue();
         localStorage.setItem(id, code);
     });
+    return editor;
 }
 
-initEditor("editor-left")
-initEditor("editor-right")
+let leftEditor = initEditor("editor-left");
+let rightEditor = initEditor("editor-right");
 
-
-// function callSmartMethod(action, attrs) {
-//     let callString = action + '\n' + attrs.join(' ');
-//     let file = new File(selectedFile);
-//     $.ajax("/api/communicate-maintain", {
-//         data: {
-//             'id': file.maintainId,
-//             'line': callString
-//         },
-//         method: "POST"
-//     }).done(function (result) {
-//         console.log(result);
-//         InterfaceConsole.appendData(result);
-//         if (result.stderr) {
-//             file.maintainId = null;
-//             fileSelected(file.name);
-//         }
-//     });
-// }
-
+if (!leftEditor.getValue() && !rightEditor.getValue()) {
+    leftEditor.setValue(examples['contract']['code'])
+    rightEditor.setValue(examples['tests']['code'])
+}
 
 function runDemo(demoId) {
     $.ajax("/api/simulate-demo", {
@@ -94,22 +88,3 @@ $('.demo-button').on('click', function (ev) {
    openViewer();
 });
 
-// $('.create-button').on('click', function () {
-//     swal({
-//         content: {
-//             element: 'input',
-//             attributes: {
-//                 placeholder: 'Type file name here'
-//             }
-//         },
-//         title: 'Create new file',
-//         text: 'Use .c, .cpp or .ll extension.',
-//         buttons: {
-//             cancel: true,
-//             confirm: true
-//         }
-//     }).then(function (value) {
-//         if (value)
-//             tryCreateFile(value);
-//     });
-// });

@@ -6,7 +6,7 @@
     <style>
         html, body {
             color: #d3d3d3;
-            font: 12pt arial;
+            font: 14pt arial;
             background-color: #222222;
             height: 100%;
             margin: 0px;
@@ -22,8 +22,9 @@
 
         #right-toolbox {
             width: 19.5%;
-            height: 99%;
+            height: 98%;
             float: right;
+            padding-top: 1%;
         }
 
         #state-msg {
@@ -59,6 +60,44 @@
         a:hover {
             color: #72d5a3;
         }
+
+        #global-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 60px;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+        }
+
+        .header span {
+            flex-grow: 0;
+            font: bold 24px sans-serif;
+            color: white;
+            display: block;
+            padding: 8px;
+        }
+
+        #header {
+            width: 79.5%;
+            border-right: 1px solid #444444;
+            border-left: 1px solid #44444400;
+            float: left;
+        }
+
+        #right-header {
+            float: right;
+            width: 19.5%;
+        }
+
+
     </style>
 
     <script type="text/javascript" src="vis.js"></script>
@@ -66,11 +105,19 @@
 </head>
 
 <body>
-<div id="state-msg">
-    <div id="state-msg-content">Loading…</div>
+<div id="header" class="header">
+    <span>Current Fantom network state</span>
 </div>
-<div id="graph"></div>
-<div id="right-toolbox">
+<div id="right-header" class="header">
+    <span>Vertx/Edge info</span>
+</div>
+<div id="global-container">
+    <div id="state-msg">
+        <div id="state-msg-content">Loading…</div>
+    </div>
+    <div id="graph"></div>
+    <div id="right-toolbox">
+    </div>
 </div>
 <script type="text/javascript">
     var network = null;
