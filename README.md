@@ -2,6 +2,20 @@
 Task I have solved is from Fantom project: a simulator for smart contracts to show how a network will change after the deployment.
 
 Let’s see what I've done!
+# Structure
+
+<ol type="1" style="font-size: x-large;">
+<li> [Premise](#premise)
+<li> [Solution](#main-idea)
+<ol type="a" style="font-size: large;">
+  <li> [LIVE DEMO](https://www.youtube.com/watch?v=r4JFkFgU8p0&feature=youtu.be)
+  <li> [Web-site](http://209.97.131.179:8096)
+  <li> [Explanation](#explanation)
+</ol>
+<li> [Directory Structure](#directory-structure)
+<li> [Installation](#installation)
+<li> [Team](#team)
+</ol>
 
 ## Premise
 It’s very important for developers to test their contracts beforehand, but logs and `stderr` don’t always give a comprehensive information about the program and its trustworthiness.
@@ -20,6 +34,7 @@ Below you can find an explanation of every single part of this infrastructure.
 
 # Explanation
 My solution is a web site, which allows develop and test smart contracts for the Fantom network in realtime, and see what is happening with your own eyes.
+<img src="img/WholeSchema.png">
 
 First of all, you need to write your own smart contract and some tests for them. You also can choose a standard one. After that, you can go on my web site and paste code in the left part of the page and tests in the right part.
 
@@ -40,6 +55,24 @@ As you can see, widths of edges are different and depends of transactions amount
 
 All the edges and vertices are clickable and contain information about themselves. So, in the right part of the web site you can always see info, such as total balance for every vertex and list of latest transactions with amounts and links to the <a href="https://explorer.fantom.foundation"> Fantom Explorer </a> for every edge.
 <img src="/img/AddressInfo.png">
+
+# Directory structure
+
+    /examples (default smart contract code and tests for him)
+
+    /static (static html of visualisation web-site)
+
+    /web-runner (server and dynamic part of visualisation web-site)
+
+    /check1.py (check that backend and testnet works and responds correctly)
+
+    /demo{1, 2}.py (demos for web-site http://209.97.131.179:8096)
+
+    /main.py (main backend for visualisations)
+
+    /runner.py (for local tests execution ./runner.py examples/contract.py examples/test.py)
+
+    /generators.py and /testnet.py library files for backend
 
 # Installation
 To install and test all the code locally, use this guide.
