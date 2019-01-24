@@ -2,6 +2,10 @@
 import bottle
 import json
 from collections import defaultdict
+import os
+
+
+STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 
 VERTICES = []
@@ -13,7 +17,7 @@ EPOCH = 0
 
 @bottle.get('/static/<path:path>')
 def static(path):
-    return bottle.static_file(path, root='static')
+    return bottle.static_file(path, root=STATIC_ROOT)
 
 
 @bottle.get('/')
