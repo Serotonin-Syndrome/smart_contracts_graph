@@ -20,7 +20,7 @@ public:
 
     NotEnoughBalance(Address from, Address to, Balance amount)
         : msg_(Fmtr()
-            .append("not engouh balance to transfer ").append(amount)
+            .append("not enough balance to transfer ").append(amount)
             .append("from ").append(from)
             .append("to ").append(to)
             .get())
