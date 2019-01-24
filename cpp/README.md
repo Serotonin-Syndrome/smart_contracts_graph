@@ -1,5 +1,5 @@
 This example demonstrates that our solution can visualize any network with smart
-contracts written in any language; particulary, in C++.
+contracts written in any language; particularly, in C++.
 
 You will need a C++ compiler, GNU Make, `pkg-config`, and `libcurl` with its
 header files.
