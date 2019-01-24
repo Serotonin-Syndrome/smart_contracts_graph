@@ -1,7 +1,8 @@
 This example demonstrates that our solution can visualize any network with smart
 contracts written in any language; particulary, in C++.
 
-You will need a C++ compiler, GNU Make, and `libcurl` with its header files.
+You will need a C++ compiler, GNU Make, `pkg-config`, and `libcurl` with its
+header files.
 
 1. Compile this simulation by running `make`.
 
