@@ -1,10 +1,9 @@
 #include "rest.h"
 #include "fmtr.h"
-#include <string>
 #include <curl/curl.h>
+#include <stdlib.h>
 #include <exception>
 #include <string>
-#include <stdlib.h>
 
 class CurlError : public std::exception
 {

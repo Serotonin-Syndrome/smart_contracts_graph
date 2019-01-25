@@ -6,31 +6,10 @@
 #include <map>
 #include <utility>
 #include <memory>
-#include <exception>
-#include <string>
 #include "common.h"
 #include "fmtr.h"
 #include "rest.h"
 #include "itestnet.h"
-
-class NotEnoughBalance : public std::exception
-{
-    std::string msg_;
-public:
-
-    NotEnoughBalance(Address from, Address to, Balance amount)
-        : msg_(Fmtr()
-            .append("not enough balance to transfer ").append(amount)
-            .append("from ").append(from)
-            .append("to ").append(to)
-            .get())
-    {}
-
-    virtual const char * what() const noexcept override
-    {
-        return msg_.c_str();
-    }
-};
 
 template<class Contract>
 class TestNet : public ITestnet
@@ -108,11 +87,12 @@ public:
     }
 
     template<class Method, class ...Args>
-    void call_method(Method method, Address sender, Balance amount, Args&& ...args)
+    auto call_method(Method method, Address sender, Balance amount, Args&& ...args)
+        -> decltype(auto)
     {
         assert(contract_);
         transfer_(sender, contract_addr_, amount);
-        (contract_.get()->*method)(sender, amount, std::forward<Args>(args)...);
+        return (contract_.get()->*method)(sender, amount, std::forward<Args>(args)...);
     }
 };
 

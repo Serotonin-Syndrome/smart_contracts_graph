@@ -1,5 +1,6 @@
-#include "testnet.h"
 #include "common.h"
+#include "itestnet.h"
+#include "testnet.h"
 #include <map>
 
 class MyContract
