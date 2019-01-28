@@ -3,6 +3,10 @@ values.
 
 The state may be either locked on unlocked; locked means all the changes being
 made are not flushed to the front-end immediately; unlocked means they are.
+Initially, the state is locked.
+
+Following is the list of REST API endpoints; use POST method to access all of
+these.
 
 # `/reset`
 
@@ -13,7 +17,7 @@ state.
 
 (no fields)
 
-### Response:
+### Response example:
 
 ````
 {"ok": true}
@@ -29,7 +33,7 @@ Unlocks the state and flushes the current state to the front-end.
 
 (no fields)
 
-### Response:
+### Response example:
 
 ````
 {"ok": true}
@@ -47,7 +51,7 @@ Add a vertex to the graph.
 | `group`  | int    | vertex group ID (used for coloring)    |
 | `title`  | string | information about the vertex           |
 
-### Response:
+### Response example:
 
 ````
 {"ok": true, "index": 0}
@@ -66,7 +70,7 @@ Add an edge to the graph.
 | `value`  | float  | edge size relative to other edges      |
 | `title`  | string | information about the edge             |
 
-### Response:
+### Response example:
 
 ````
 {"ok": true}
