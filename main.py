@@ -40,6 +40,7 @@ def get_graph():
         return bottle.HTTPError(418)
 
     if not READY:
+        bottle.response.content_type = 'application/json'
         return json.dumps({'vertices': [], 'edges': []})
 
     bottle.response.content_type = 'application/json'
@@ -57,19 +58,20 @@ def get_edge_titles():
     return json.dumps(TITLES_BY_EDGE[(from_, to)])
 
 
-@bottle.post('/add-vertex', method='post')
+@bottle.post('/add-vertex')
 def add_vertex():
     value = float(bottle.request.forms['value'])
     group = int(bottle.request.forms['group'])
     title = bottle.request.forms['title']
 
+    index = len(VERTICES)
     VERTICES.append((value, group, title))
 
     bottle.response.content_type = 'application/json'
-    return json.dumps({'ok': True})
+    return json.dumps({'ok': True, 'index': index})
 
 
-@bottle.post('/add-edge', method='post')
+@bottle.post('/add-edge')
 def add_edge():
     from_  = int(bottle.request.forms['from'])
     to     = int(bottle.request.forms['to'])
@@ -83,7 +85,7 @@ def add_edge():
     return json.dumps({'ok': True})
 
 
-@bottle.post('/ready', method='post')
+@bottle.post('/ready')
 def ready():
     global READY
     READY = True
@@ -92,7 +94,7 @@ def ready():
     return json.dumps({'ok': True})
 
 
-@bottle.post('/reset', method='post')
+@bottle.post('/reset')
 def reset():
     global READY, VERTICES, EDGES, TITLES_BY_EDGE, EPOCH
 
