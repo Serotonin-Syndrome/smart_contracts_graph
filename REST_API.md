@@ -6,7 +6,7 @@ made are not flushed to the front-end immediately; unlocked means they are.
 Initially, the state is locked.
 
 Following is the list of REST API endpoints; use POST method to access all of
-these.
+these. The base URL is `http://localhost:8080`.
 
 # `/reset`
 
