@@ -22,7 +22,7 @@
 
         #right-toolbox {
             width: 19.5%;
-            height: 98%;
+            height: auto;
             float: right;
             padding-top: 1%;
         }
@@ -77,7 +77,7 @@
             height: 60px;
         }
 
-        .header span {
+        .header-inner {
             flex-grow: 0;
             font: bold 24px sans-serif;
             color: white;
@@ -97,7 +97,6 @@
             width: 19.5%;
         }
 
-
     </style>
 
     <script type="text/javascript" src="vis.js"></script>
@@ -106,10 +105,10 @@
 
 <body>
 <div id="header" class="header">
-    <span>Current Fantom network state</span>
+    <span class="header-inner">Current <span style="color: #00B1FF;">Fantom</span> Network State</span>
 </div>
 <div id="right-header" class="header">
-    <span>Vertx/Edge info</span>
+    <span class="header-inner">Vertex or Edge Info</span>
 </div>
 <div id="global-container">
     <div id="state-msg">
@@ -117,6 +116,7 @@
     </div>
     <div id="graph"></div>
     <div id="right-toolbox">
+        <span style="color: #999999;">Click on a vertex or an edge.</span>
     </div>
 </div>
 <script type="text/javascript">
@@ -144,19 +144,9 @@
     };
 
     var tb = document.getElementById('right-toolbox');
-    var VCaptions;
-    var since_v;
-    var since_e;
-
-    function clear() {
-        tb.innerHTML = '<span style="color: #999999;">Click on a node or an edge.</span>';
-        data.nodes.clear();
-        data.edges.clear();
-        VCaptions = {};
-        since_v = 0;
-        since_e = 0;
-    }
-    clear();
+    var VCaptions = {};
+    var since_v = 0;
+    var since_e = 0;
 
     function gen_edge_id(From, To) {
         return 'e' + From + '_' + To;
@@ -171,7 +161,6 @@
     }
 
     function alter_node_value(NodeID, Delta) {
-        console.log('alter_node_value', NodeID, Delta);
         var value = data.nodes.get(NodeID).value + Delta;
         var title = VCaptions[NodeID];
         data.nodes.update({
@@ -208,7 +197,7 @@
                 return;
             }
             if (xhr.status != 200) {
-                tb.innerHTML = 'Error ' + xhr.status;
+                tb.innerHTML = 'Something went wrong: error ' + xhr.status;
                 return;
             }
             var R = JSON.parse(xhr.responseText);
@@ -218,6 +207,9 @@
     }
 
     function create_network() {
+        if (network !== null) {
+            return;
+        }
         network = new vis.Network(container, data, options);
         network.on('click', function (params) {
             var NodeID = this.getNodeAt(params.pointer.DOM);
@@ -247,9 +239,6 @@
     var epoch = null;
 
     function update() {
-        if (epoch === null) {
-            return;
-        }
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/get-graph?epoch=' + epoch + '&since_v=' + since_v + '&since_e=' + since_e, true);
         xhr.onreadystatechange = function() {
@@ -258,13 +247,12 @@
             }
             if (xhr.status != 200) {
                 if (xhr.status == 418) {
-                    set_state_msg('New epoch, loading…');
-                    epoch = null;
-                    update_epoch();
+                    set_state_msg('New epoch, reloading the page…');
+                    window.location.reload(false);
                 } else {
-                    set_state_msg('Error ' + xhr.status + ', reconnecing…');
+                    set_state_msg('Error ' + xhr.status + ' updating, reconnecting…');
+                    setTimeout(update, 1000);
                 }
-                clear();
                 return;
             }
             set_state_msg(null);
@@ -289,7 +277,6 @@
                 var ID = gen_edge_id(/*from*/ E[0], /*to*/ E[1]);
                 var O = data.edges.get(ID);
                 if (O === null) {
-                    console.log('add edge', E);
                     data.edges.add({
                         id:    ID,
                         from:  E[0],
@@ -322,14 +309,13 @@
 
             since_v += G.vertices.length;
             since_e += G.edges.length;
+            setTimeout(update, 500);
         };
 
         xhr.send();
     }
 
-    setInterval(update, 500);
-
-    function update_epoch() {
+    function get_epoch() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/get-epoch', true);
         xhr.onreadystatechange = function() {
@@ -338,20 +324,20 @@
             }
             if (xhr.status != 200) {
                 set_state_msg('Error ' + xhr.status + ', reconnecting…');
-                clear();
-                setTimeout(update_epoch, 1000);
+                setTimeout(get_epoch, 1000);
                 return;
             }
             set_state_msg(null);
 
             var R = JSON.parse(xhr.responseText);
             epoch = R.epoch;
-        }
 
+            update();
+        }
         xhr.send();
     }
 
-    update_epoch();
+    get_epoch();
 
 </script>
 </body>
