@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gossip demo</title>
+
+    <style>
+        html, body {
+            color: #d3d3d3;
+            font: 14pt arial;
+            background-color: #222222;
+            height: 100%;
+            margin: 0px;
+        }
+
+        #graph {
+            width: 100%;
+            height: 95%;
+        }
+
+        #button-container {
+            text-align: center;
+            font-size: xx-large;
+        }
+
+        #button {
+            text-decoration: none !important;
+        }
+
+        a {
+            color: #60b48a;
+        }
+
+        a:hover {
+            color: #72d5a3;
+        }
+    </style>
+
+    <script type="text/javascript" src="vis.js"></script>
+    <link href="vis-network.min.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div id="button-container">
+    <span id="loading-text">Loading…</span>
+    <a href="#" id="button" style="display: none;">Simulate Gossip!</a>
+</div>
+<div id="graph"></div>
+<script type="text/javascript">
+    var container = document.getElementById('graph');
+    var data = {
+        nodes: new vis.DataSet([]),
+        edges: new vis.DataSet([]),
+    };
+    var options = {
+        nodes: {
+            shape: 'dot',
+            size: 30,
+            font: {
+                size: 26,
+                color: '#ffffff',
+            },
+            borderWidth: 2,
+        },
+        physics: {
+        },
+        interaction: {
+        },
+    };
+
+    var E = {};
+    function add_edge(from, to) {
+        var arr = E[from];
+        if (arr === undefined) {
+            arr = [];
+            E[from] = arr;
+        }
+        arr.push(to);
+        data.edges.add({from: from, to: to});
+    }
+
+    const NROUNDS = 7;
+
+    const TIMEOUT_FADE = 1000;
+    const TIMEOUT_SEND = 500;
+
+    (function() {
+        for (var i = 0, m = 1; i < NROUNDS; ++i, m *= 2) {
+            for (var j = 0; j < m; ++j) {
+                data.nodes.add({
+                    id:     m + j,
+                    group:  1,
+                });
+                if (m != 1) {
+                    add_edge(m / 2 + Math.floor(j / 2), m + j);
+                }
+            }
+        }
+    })();
+
+    var fire = function(node_id) {
+        data.nodes.update({id: node_id, group: 2});
+        setTimeout(function() { data.nodes.update({id: node_id, group: 1}); }, TIMEOUT_FADE);
+        setTimeout(function() {
+            var arr = E[node_id];
+            if (arr === undefined) {
+                return;
+            }
+            for (var i = 0; i < arr.length; ++i) {
+                fire(arr[i]);
+            }
+        }, TIMEOUT_SEND);
+    };
+
+    var network = new vis.Network(container, data, options);
+    network.on("stabilized", function() {
+        document.getElementById('loading-text').style.display = 'none';
+        document.getElementById('button').style.display = 'inline';
+    });
+
+    document.getElementById('button').onclick = function() { fire(1); };
+
+</script>
+</body>
+</html>
