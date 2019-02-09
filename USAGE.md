@@ -10,4 +10,4 @@ Run `./main.py` to start the server; it works on the 8080 port. Then go to http:
 
 * Run `./demo2.py`, `./demo3.py`, or `./demo4.py` to run the graph demos.
 
-* Run `./test1.sh` to run the automated test.
+* Run `./tests/test1.sh` to run the automated test.
