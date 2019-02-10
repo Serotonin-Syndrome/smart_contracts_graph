@@ -85,11 +85,10 @@
             borderWidth: 2,
         },
         physics: {
-            stabilization: {
-                iterations: 1000,
-            },
         },
-        interaction: {
+        groups: {
+            1: {color: {background: '#999999', border: '#cecece', highlight: '#ededed'}},
+            2: {color: {background: '#e03a3a', border: '#ff5959', highlight: '#ff8080'}},
         },
     };
 
@@ -104,12 +103,12 @@
         data.edges.add({from: from, to: to});
     }
 
-    //var TIMEOUT_FADE = 1000;
+    var TIMEOUT_FADE = 1000;
     var TIMEOUT_SEND = 500;
 
     function fire(node_id) {
         data.nodes.update({id: node_id, group: 2});
-        //setTimeout(function() { data.nodes.update({id: node_id, group: 1}); }, TIMEOUT_FADE);
+        setTimeout(function() { data.nodes.update({id: node_id, group: 1}); }, TIMEOUT_FADE);
         setTimeout(function() {
             var arr = E[node_id];
             if (arr === undefined) {
@@ -123,6 +122,17 @@
 
     function ready(start_node_id) {
         var network = new vis.Network(container, data, options);
+
+        var okay_called = false;
+        function okay() {
+            if (okay_called) {
+                return;
+            }
+            okay_called = true;
+            document.getElementById('loading-text').style.display = 'none';
+            document.getElementById('button').style.display = 'inline';
+        }
+
         network.on('stabilizationProgress', function(params) {
             var num = params.iterations;
             var denom = params.total;
@@ -131,9 +141,13 @@
                 document.getElementById('progress-bar').style.width = Math.round((fraction > 1 ? 1 : fraction) * 100) + '%';
                 return;
             }
-            document.getElementById('loading-text').style.display = 'none';
-            document.getElementById('button').style.display = 'inline';
+            okay();
         });
+
+        network.on('stabilized', function() {
+            okay();
+        });
+
         var button = document.getElementById('button');
         button.onclick = function() {
             button.className += ' button-inactive';

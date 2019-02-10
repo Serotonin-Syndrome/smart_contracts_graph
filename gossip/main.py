@@ -24,7 +24,7 @@ def index():
 
 @bottle.get('/network')
 def network():
-    NROUNDS = 8
+    NROUNDS = 5
 
     edges = []
     for i in range(1, NROUNDS):
