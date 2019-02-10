@@ -47,10 +47,6 @@
             width: 0.5%;
         }
 
-        .button-inactive {
-            color: #708090 !important;
-        }
-
     </style>
 
     <script type="text/javascript" src="vis.js"></script>
@@ -87,8 +83,8 @@
         physics: {
         },
         groups: {
-            1: {color: {background: '#999999', border: '#cecece', highlight: '#ededed'}},
-            2: {color: {background: '#e03a3a', border: '#ff5959', highlight: '#ff8080'}},
+            1: {color: {background: '#999999', border: '#cecece'}},
+            2: {color: {background: '#e03a3a', border: '#ff8080'}},
         },
     };
 
@@ -149,11 +145,7 @@
         });
 
         var button = document.getElementById('button');
-        button.onclick = function() {
-            button.className += ' button-inactive';
-            button.onclick = undefined;
-            fire(start_node_id);
-        };
+        button.onclick = function() { fire(start_node_id); };
     }
 
     function set_error(code) {
