@@ -7,6 +7,11 @@ import json
 STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 
+def _json(obj):
+    bottle.response.content_type = 'application/json'
+    return json.dumps(obj)
+
+
 @bottle.get('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root=STATIC_ROOT)
@@ -27,10 +32,11 @@ def network():
         for j in range(m):
             edges.append((m // 2 + j // 2, m + j))
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps(dict(edges=edges,
-                           size=(1 << NROUNDS) - 1,
-                           start_from=1))
+    return _json({
+        'edges': edges,
+        'size': (1 << NROUNDS) - 1,
+        'start_from': 1,
+    })
 
 
 if __name__ == '__main__':

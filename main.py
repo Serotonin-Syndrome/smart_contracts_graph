@@ -8,6 +8,11 @@ import os
 STATIC_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 
+def _json(obj):
+    bottle.response.content_type = 'application/json'
+    return json.dumps(obj)
+
+
 VERTICES = []
 EDGES = []
 TITLES_BY_EDGE = defaultdict(list)
@@ -27,8 +32,7 @@ def index():
 
 @bottle.get('/get-epoch')
 def get_epoch():
-    bottle.response.content_type = 'application/json'
-    return json.dumps({'epoch': EPOCH})
+    return _json({'epoch': EPOCH})
 
 
 @bottle.get('/get-graph')
@@ -41,11 +45,9 @@ def get_graph():
         return bottle.HTTPError(418)
 
     if not READY:
-        bottle.response.content_type = 'application/json'
-        return json.dumps({'vertices': [], 'edges': []})
+        return _json({'vertices': [], 'edges': []})
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps({'vertices': VERTICES[since_v:], 'edges': EDGES[since_e:]})
+    return _json({'vertices': VERTICES[since_v:], 'edges': EDGES[since_e:]})
 
 
 @bottle.get('/get-edge-titles')
@@ -55,8 +57,7 @@ def get_edge_titles():
     from_  = int(bottle.request.query['from'])
     to     = int(bottle.request.query['to'])
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps(TITLES_BY_EDGE[(from_, to)])
+    return _json(TITLES_BY_EDGE[(from_, to)])
 
 
 @bottle.post('/add-vertex')
@@ -68,8 +69,7 @@ def add_vertex():
     index = len(VERTICES)
     VERTICES.append((value, group, title))
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps({'ok': True, 'index': index})
+    return _json({'ok': True, 'index': index})
 
 
 @bottle.post('/add-edge')
@@ -82,8 +82,7 @@ def add_edge():
     TITLES_BY_EDGE[(from_, to)].append(title)
     EDGES.append((from_, to, value))
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps({'ok': True})
+    return _json({'ok': True})
 
 
 @bottle.post('/ready')
@@ -91,8 +90,7 @@ def ready():
     global READY
     READY = True
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps({'ok': True})
+    return _json({'ok': True})
 
 
 @bottle.post('/reset')
@@ -105,9 +103,8 @@ def reset():
     TITLES_BY_EDGE = defaultdict(list)
     EPOCH += 1
 
-    bottle.response.content_type = 'application/json'
-    return json.dumps({'ok': True})
+    return _json({'ok': True})
 
 
 if __name__ == '__main__':
-    bottle.run(host="0.0.0.0", port=8080)
+    bottle.run(host='0.0.0.0', port=8080)
