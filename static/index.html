@@ -98,6 +98,10 @@
             width: 19.5%;
         }
 
+        .transactions {
+            font-size: 12pt;
+        }
+
     </style>
 
     <script type="text/javascript" src="vis.js"></script>
@@ -144,28 +148,28 @@
         },
     };
 
-    var tb = document.getElementById('right-toolbox');
-    var VCaptions = {};
+    var toolbox = document.getElementById('right-toolbox');
+    var vertex_titles = {};
     var since_v = 0;
     var since_e = 0;
 
-    function gen_edge_id(From, To) {
-        return 'e' + From + '_' + To;
+    function gen_edge_id(from_id, to_id) {
+        return 'e' + from_id + '_' + to_id;
     }
 
-    function parse_edge_id(EdgeID) {
-        var m = EdgeID.match(/^e([0-9]+)_([0-9]+)$/);
+    function parse_edge_id(edge_id) {
+        var m = edge_id.match(/^e([0-9]+)_([0-9]+)$/);
         return {
             from: parseInt(m[1], 10),
             to:   parseInt(m[2], 10),
         };
     }
 
-    function alter_node_value(NodeID, Delta) {
-        var value = data.nodes.get(NodeID).value + Delta;
-        var title = VCaptions[NodeID];
+    function alter_node_value(node_id, delta) {
+        var value = data.nodes.get(node_id).value + delta;
+        var title = vertex_titles[node_id];
         data.nodes.update({
-            id:    NodeID,
+            id:    node_id,
             value: value,
             title: gen_node_title(value, title, false),
         });
@@ -181,16 +185,16 @@
         }
     }
 
-    function node_clicked(NodeID) {
-        var value = data.nodes.get(NodeID).value;
-        var title = VCaptions[NodeID];
-        tb.innerHTML = gen_node_title(value, title, true);
+    function node_clicked(node_id) {
+        var value = data.nodes.get(node_id).value;
+        var title = vertex_titles[node_id];
+        toolbox.innerHTML = gen_node_title(value, title, true);
     }
 
-    function edge_clicked(EdgeID) {
-        tb.innerHTML = 'Loading…';
+    function edge_clicked(edge_id) {
+        toolbox.innerHTML = 'Loading…';
 
-        var e = parse_edge_id(EdgeID);
+        var e = parse_edge_id(edge_id);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/get-edge-titles?from=' + e.from + '&to=' + e.to, true);
         xhr.onreadystatechange = function() {
@@ -198,11 +202,11 @@
                 return;
             }
             if (xhr.status != 200) {
-                tb.innerHTML = 'Something went wrong: error ' + xhr.status;
+                toolbox.innerHTML = 'Something went wrong: error ' + xhr.status;
                 return;
             }
             var R = JSON.parse(xhr.responseText);
-            tb.innerHTML = '<b>Transactions</b>:<ul><li>' + R.join('<li>') + '</ul>';
+            toolbox.innerHTML = '<b>Transactions</b>:<ul class="transactions"><li>' + R.join('<li>') + '</ul>';
         }
         xhr.send();
     }
@@ -213,28 +217,28 @@
         }
         network = new vis.Network(container, data, options);
         network.on('click', function (params) {
-            var NodeID = this.getNodeAt(params.pointer.DOM);
-            if (NodeID !== undefined) {
-                node_clicked(NodeID);
+            var node_id = this.getNodeAt(params.pointer.DOM);
+            if (node_id !== undefined) {
+                node_clicked(node_id);
             } else {
-                var EdgeID = this.getEdgeAt(params.pointer.DOM);
-                if (EdgeID !== undefined) {
-                    edge_clicked(EdgeID);
+                var edge_id = this.getEdgeAt(params.pointer.DOM);
+                if (edge_id !== undefined) {
+                    edge_clicked(edge_id);
                 }
             }
         });
     }
 
-    function gen_node_title(X, T, isFull) {
-        if (isFull) {
-            return '<b>Address</b>: ' + T + '<br/><b>Balance</b>: ' + X + ' FTM';
+    function gen_node_title(value, title, is_full) {
+        if (is_full) {
+            return '<b>Address</b>: ' + title + '<br/><b>Balance</b>: ' + value + ' FTM';
         } else {
-            return                      T + '<br/><b>Balance</b>: ' + X + ' FTM';
+            return                      title + '<br/><b>Balance</b>: ' + value + ' FTM';
         }
     }
 
-    function gen_edge_title(X) {
-        return '<b>Total amount</b>: ' + X + ' FTM';
+    function gen_edge_title(value) {
+        return '<b>Total amount</b>: ' + value + ' FTM';
     }
 
     var epoch = null;
@@ -261,42 +265,41 @@
             var G = JSON.parse(xhr.responseText);
 
             for (var i = 0; i < G.vertices.length; ++i) {
-                var V = G.vertices[i];
-                var ID = since_v + i;
-                var caption = V[2];
-                VCaptions[ID] = caption;
+                var vertex = G.vertices[i];
+                var node_id = since_v + i;
+                var title = vertex[2];
+                vertex_titles[node_id] = title;
                 data.nodes.add({
                     id:    since_v + i,
-                    value: V[0],
-                    group: V[1],
-                    title: gen_node_title(V[0], caption, false),
+                    value: vertex[0],
+                    group: vertex[1],
+                    title: gen_node_title(vertex[0], title, false),
                 });
             }
             for (var i = 0; i < G.edges.length; ++i) {
-                var E = G.edges[i];
-
-                var ID = gen_edge_id(/*from*/ E[0], /*to*/ E[1]);
-                var O = data.edges.get(ID);
-                if (O === null) {
+                var edge = G.edges[i];
+                var edge_id = gen_edge_id(/*from*/ edge[0], /*to*/ edge[1]);
+                var obj = data.edges.get(edge_id);
+                if (obj === null) {
                     data.edges.add({
-                        id:    ID,
-                        from:  E[0],
-                        to:    E[1],
-                        value: E[2],
-                        title: gen_edge_title(E[2]),
+                        id:    edge_id,
+                        from:  edge[0],
+                        to:    edge[1],
+                        value: edge[2],
+                        title: gen_edge_title(edge[2]),
                     });
                 } else {
-                    var value = O.value + E[2];
+                    var value = obj.value + edge[2];
                     data.edges.update({
-                        id:    ID,
+                        id:    edge_id,
                         title: gen_edge_title(value),
                         value: value,
                     });
 
                 }
 
-                alter_node_value(/*from*/ E[0], -E[2]);
-                alter_node_value(/*to*/   E[1], +E[2]);
+                alter_node_value(/*from*/ edge[0], -edge[2]);
+                alter_node_value(/*to*/   edge[1], +edge[2]);
             }
 
             if (
