@@ -79,26 +79,10 @@
         data.edges.add({from: from, to: to});
     }
 
-    const NROUNDS = 7;
-
     const TIMEOUT_FADE = 1000;
     const TIMEOUT_SEND = 500;
 
-    (function() {
-        for (var i = 0, m = 1; i < NROUNDS; ++i, m *= 2) {
-            for (var j = 0; j < m; ++j) {
-                data.nodes.add({
-                    id:     m + j,
-                    group:  1,
-                });
-                if (m != 1) {
-                    add_edge(m / 2 + Math.floor(j / 2), m + j);
-                }
-            }
-        }
-    })();
-
-    var fire = function(node_id) {
+    function fire(node_id) {
         data.nodes.update({id: node_id, group: 2});
         setTimeout(function() { data.nodes.update({id: node_id, group: 1}); }, TIMEOUT_FADE);
         setTimeout(function() {
@@ -110,15 +94,47 @@
                 fire(arr[i]);
             }
         }, TIMEOUT_SEND);
-    };
+    }
 
-    var network = new vis.Network(container, data, options);
-    network.on("stabilized", function() {
-        document.getElementById('loading-text').style.display = 'none';
-        document.getElementById('button').style.display = 'inline';
-    });
+    function ready(start_node_id) {
+        var network = new vis.Network(container, data, options);
+        network.on('stabilized', function() {
+            document.getElementById('loading-text').style.display = 'none';
+            document.getElementById('button').style.display = 'inline';
+        });
+        document.getElementById('button').onclick = function() { fire(start_node_id); };
+    }
 
-    document.getElementById('button').onclick = function() { fire(1); };
+    function set_error(code) {
+        document.getElementById('loading-text').innerHTML = 'Something went wrong (status ' + code + ')';
+    }
+
+    (function() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'network.json', true);
+        xhr.overrideMimeType('application/json');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) {
+                return;
+            }
+            if (xhr.status != 200) {
+                set_error(xhr.status);
+                return;
+            }
+            var G = JSON.parse(xhr.responseText);
+            var size = G.size;
+            for (var i = 1; i <= size; ++i) {
+                data.nodes.add({id: i, group: 1});
+            }
+            var edges = G.edges;
+            for (var i = 0; i < edges.length; ++i) {
+                var edge = edges[i];
+                add_edge(edge[0], edge[1]);
+            }
+            ready(G.start_from);
+        };
+        xhr.send();
+    })();
 
 </script>
 </body>
