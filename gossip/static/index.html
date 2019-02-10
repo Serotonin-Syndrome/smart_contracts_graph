@@ -46,6 +46,11 @@
             background-color: #ffffff;
             width: 0.5%;
         }
+
+        .button-inactive {
+            color: #708090 !important;
+        }
+
     </style>
 
     <script type="text/javascript" src="vis.js"></script>
@@ -102,10 +107,8 @@
     //var TIMEOUT_FADE = 1000;
     var TIMEOUT_SEND = 500;
 
-    var current_group = 1;
-
     function fire(node_id) {
-        data.nodes.update({id: node_id, group: current_group});
+        data.nodes.update({id: node_id, group: 2});
         //setTimeout(function() { data.nodes.update({id: node_id, group: 1}); }, TIMEOUT_FADE);
         setTimeout(function() {
             var arr = E[node_id];
@@ -131,8 +134,10 @@
             document.getElementById('loading-text').style.display = 'none';
             document.getElementById('button').style.display = 'inline';
         });
-        document.getElementById('button').onclick = function() {
-            current_group++;
+        var button = document.getElementById('button');
+        button.onclick = function() {
+            button.className += ' button-inactive';
+            button.onclick = undefined;
             fire(start_node_id);
         };
     }
