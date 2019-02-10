@@ -111,7 +111,7 @@
 
     (function() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'network.json', true);
+        xhr.open('GET', '/network', true);
         xhr.overrideMimeType('application/json');
         xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) {

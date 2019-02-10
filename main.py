@@ -27,6 +27,7 @@ def index():
 
 @bottle.get('/get-epoch')
 def get_epoch():
+    bottle.response.content_type = 'application/json'
     return json.dumps({'epoch': EPOCH})
 
 
