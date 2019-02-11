@@ -109,6 +109,8 @@ gossip/main.py
 and direct your browser to http://localhost:8035/.
 
 <img src="/img/Gossip1.png">
+<br/>
+<img src="/img/Gossip2.png">
 
 # Launching the site locally
 ```
