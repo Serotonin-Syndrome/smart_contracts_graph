@@ -1,4 +1,4 @@
-const CLIENT_COMPATIBILITY = "0.1.4";
+const CLIENT_COMPATIBILITY = "0.1.5";
 
 const LAST_COMPATIBILITY = localStorage.getItem("client_compatibility")
 if (CLIENT_COMPATIBILITY != LAST_COMPATIBILITY) {
@@ -11,7 +11,7 @@ examples = {
         "code": "class MyContract:\n    def __init__(self, testnet, creator_addr, my_addr, amount):\n        self._testnet = testnet\n\n    def ping(self, who, amount):\n        self._testnet.pay(who, amount)\n"
     },
     "tests": {
-        "code": "import os\n\ndef run_tests(generators, TestNet, MyContract):\n    creator_addr = generators.gen_addr()\n    contract_addr = generators.gen_addr()\n    users = [generators.gen_addr() for _ in range(7)]\n\n    balances = {creator_addr: 2001}\n    for user in users:\n        balances[user] = 952\n\n    testnet = TestNet(balances)\n    testnet.deploy(MyContract, contract_addr=contract_addr, creator_addr=creator_addr, amount=10)\n    for user in users:\n        for i in range(3):\n            testnet.call_method('ping', user, i + 1, ())"
+        "code": "from time import sleep\n\ndef run_tests(generators, TestNet, MyContract):\n    creator_addr = generators.gen_addr()\n    contract_addr = generators.gen_addr()\n    users = [generators.gen_addr() for _ in range(7)]\n\n    balances = {creator_addr: 2001}\n    for user in users:\n        balances[user] = 952\n\n    testnet = TestNet(balances)\n    testnet.deploy(MyContract, contract_addr=contract_addr, creator_addr=creator_addr, amount=10)\n    for user in users:\n        for i in range(3):\n            sleep(0.5)\n            testnet.call_method('ping', user, i + 1, ())"
     }
 };
 
@@ -72,8 +72,10 @@ function runCode() {
     });
 }
 
-function openViewer() {
-    window.open("http://" + location.hostname + ":8080", "_blank");
+function openViewer(port) {
+    if (!port)
+        port = 8080
+    window.open("http://" + location.hostname + ":" + port, "_blank");
 }
 
 $('.simulate-button').on('click', function() {
@@ -84,7 +86,11 @@ $('.simulate-button').on('click', function() {
 $('.demo-button').on('click', function (ev) {
    let el = ev.target;
    let demoid = el.dataset.demoid;
-   runDemo(demoid);
-   openViewer();
+   if (demoid == 'gossip') {
+       openViewer(8035);
+   } else if (!isNaN(demoid)) {
+       runDemo(demoid);
+       openViewer();
+   }
 });
 

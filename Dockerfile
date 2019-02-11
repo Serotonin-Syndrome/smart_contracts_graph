@@ -9,6 +9,7 @@ RUN mvn clean install -DskipTests
 
 WORKDIR /app
 RUN pip3 install -r requirements.txt
+RUN pip3 install -r gossip/requirements.txt
 
 WORKDIR /app/web-runner
-CMD (java -jar target/simulator.main-0.1.0.jar &) && cd .. && python3 ./main.py
+CMD (java -jar target/simulator.main-0.1.0.jar &) && cd .. && (python3 ./main.py &) && (python3 gossip/main.py)
