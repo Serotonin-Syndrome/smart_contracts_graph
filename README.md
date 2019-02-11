@@ -74,6 +74,8 @@ All the edges and vertices are clickable and contain information about themselve
 
     /generators.py and /testnet.py (library files for the backend)
 
+    /gossip (Gossip protocol visualization)
+
 # Installation
 To install and test all the code locally, use this guide.
 First of all, clone the source code:
@@ -93,6 +95,20 @@ Run `./main.py` to start the server; it works on the 8080 port. Then go to http:
 * Run `./demo2.py`, `./demo3.py`, or `./demo4.py` to run the graph demos.
 
 * Run `./tests/test1.sh` to run the automated test.
+
+# Gossip protocol visualization
+Install the requirements:
+
+```
+sudo pip3 install -r gossip/requirements.txt
+```
+Then, launch the server:
+```
+gossip/main.py
+```
+and direct your browser to http://localhost:8035/.
+
+<img src="/img/Gossip1.png">
 
 # Launching the site locally
 ```
