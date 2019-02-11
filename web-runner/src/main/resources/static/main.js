@@ -1,4 +1,4 @@
-const CLIENT_COMPATIBILITY = "0.1.3";
+const CLIENT_COMPATIBILITY = "0.1.4";
 
 const LAST_COMPATIBILITY = localStorage.getItem("client_compatibility")
 if (CLIENT_COMPATIBILITY != LAST_COMPATIBILITY) {
@@ -11,7 +11,7 @@ examples = {
         "code": "class MyContract:\n    def __init__(self, testnet, creator_addr, my_addr, amount):\n        self._testnet = testnet\n\n    def ping(self, who, amount):\n        self._testnet.pay(who, amount)\n"
     },
     "tests": {
-        "code": "import os\nfrom time import sleep\n\n\ndef run_tests(generators, TestNet, MyContract):\n    creator_addr = generators.gen_addr()\n    contract_addr = generators.gen_addr()\n    users = [generators.gen_addr() for _ in range(7)]\n\n    balances = {creator_addr: 2001}\n    for user in users:\n        balances[user] = 952\n\n    testnet = TestNet(balances)\n    testnet.deploy(MyContract, contract_addr=contract_addr, creator_addr=creator_addr, amount=10)\n    sleep(1)\n    for user in users:\n        for i in range(3):\n            testnet.call_method('ping', user, i + 1, ())"
+        "code": "import os\n\ndef run_tests(generators, TestNet, MyContract):\n    creator_addr = generators.gen_addr()\n    contract_addr = generators.gen_addr()\n    users = [generators.gen_addr() for _ in range(7)]\n\n    balances = {creator_addr: 2001}\n    for user in users:\n        balances[user] = 952\n\n    testnet = TestNet(balances)\n    testnet.deploy(MyContract, contract_addr=contract_addr, creator_addr=creator_addr, amount=10)\n    for user in users:\n        for i in range(3):\n            testnet.call_method('ping', user, i + 1, ())"
     }
 };
 
