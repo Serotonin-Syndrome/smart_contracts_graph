@@ -18,7 +18,7 @@
             height: 95%;
         }
 
-        #button-container {
+        #top-container {
             text-align: center;
             font-size: xx-large;
         }
@@ -54,12 +54,14 @@
 </head>
 
 <body>
-<div id="button-container">
+<div id="top-container">
     <span id="loading-text">
         Loading…
         <div id="progress-bar-outer">
             <div id="progress-bar"></div>
         </div>
+    </span>
+    <span id="gossip-text" style="display: none;">
     </span>
     <a href="#" id="button" style="display: none;">Simulate Gossip!</a>
 </div>
@@ -89,6 +91,7 @@
     };
 
     var E = {};
+    var NV = null;
     function add_edge(from, to) {
         var arr = E[from];
         if (arr === undefined) {
@@ -100,31 +103,40 @@
     }
 
     var TIMEOUT_FADE = 1000;
-    var TIMEOUT_SEND = 500;
+    var TIMEOUT_SEND_MIN = 300;
+    var TIMEOUT_SEND_MAX = 700;
+    function gen_send_timeout() {
+        return Math.floor(Math.random() * (TIMEOUT_SEND_MAX - TIMEOUT_SEND_MIN)) + TIMEOUT_SEND_MIN;
+    }
+
+    var ngotinfo = 0;
+    var gossip_text = document.getElementById('gossip-text');
+    var button = document.getElementById('button');
 
     function fire(node_id) {
         data.nodes.update({id: node_id, group: 2});
+        ngotinfo++;
+        gossip_text.innerHTML = Math.round(ngotinfo / NV * 100) + '%';
         setTimeout(function() { data.nodes.update({id: node_id, group: 1}); }, TIMEOUT_FADE);
-        setTimeout(function() {
-            var arr = E[node_id];
-            if (arr === undefined) {
-                return;
-            }
-            for (var i = 0; i < arr.length; ++i) {
-                fire(arr[i]);
-            }
-        }, TIMEOUT_SEND);
+
+        var arr = E[node_id];
+        if (arr === undefined) {
+            return;
+        }
+        for (var i = 0; i < arr.length; ++i) {
+            setTimeout(fire, gen_send_timeout(), arr[i]);
+        }
     }
 
     function ready(start_node_id) {
         var network = new vis.Network(container, data, options);
 
-        var okay_called = false;
-        function okay() {
-            if (okay_called) {
+        var done_called = false;
+        function done() {
+            if (done_called) {
                 return;
             }
-            okay_called = true;
+            done_called = true;
             document.getElementById('loading-text').style.display = 'none';
             document.getElementById('button').style.display = 'inline';
         }
@@ -137,15 +149,18 @@
                 document.getElementById('progress-bar').style.width = Math.round((fraction > 1 ? 1 : fraction) * 100) + '%';
                 return;
             }
-            okay();
+            done();
         });
 
         network.on('stabilized', function() {
-            okay();
+            done();
         });
 
-        var button = document.getElementById('button');
-        button.onclick = function() { fire(start_node_id); };
+        button.onclick = function() {
+            gossip_text.style.display = 'inline';
+            button.style.display = 'none';
+            fire(start_node_id);
+        };
     }
 
     function set_error(code) {
@@ -166,6 +181,7 @@
             }
             var G = JSON.parse(xhr.responseText);
             var size = G.size;
+            NV = size;
             for (var i = 1; i <= size; ++i) {
                 data.nodes.add({id: i, group: 1});
             }
