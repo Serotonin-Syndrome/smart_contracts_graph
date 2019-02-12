@@ -66,7 +66,7 @@ All the edges and vertices are clickable and contain information about themselve
 
     /tests (automated tests)
 
-    /demo{2,3,4}.py (demos for the web site: http://209.97.131.179:8096)
+    /demo{2,3,4,5}.py (demos for the web site: http://209.97.131.179:8096)
 
     /main.py (main backend for visualizations)
 
