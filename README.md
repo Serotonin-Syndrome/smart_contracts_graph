@@ -96,6 +96,12 @@ Run `./main.py` to start the server; it works on the 8080 port. Then go to http:
 
 * Run `./tests/test1.sh` to run the automated test.
 
+# Launching the site locally
+```
+docker build -t fantom-simulator .
+docker run -p 80:8096 -p 8080:8080 -d fantom-simulator
+```
+
 # Gossip protocol visualization
 Install the requirements:
 
@@ -111,12 +117,6 @@ and direct your browser to http://localhost:8035/.
 <img src="/img/Gossip1.png">
 <br/>
 <img src="/img/Gossip2.png">
-
-# Launching the site locally
-```
-docker build -t fantom-simulator .
-docker run -p 80:8096 -p 8080:8080 -d fantom-simulator
-```
 
 # Team
 <b>Igor Evdokimov</b>, <b>Zeeshan Yousaf</b> and others.
