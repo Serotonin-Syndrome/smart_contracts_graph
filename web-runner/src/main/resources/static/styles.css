@@ -104,7 +104,7 @@ body {
 .button {
     display: block;
     border: 1px solid #60b48a;
-    color: #057005;
+    color: #60b48a;
     background-color: #010110;
     padding: 5px;
     padding-left: 9px;
@@ -183,7 +183,7 @@ body {
     display: inline-block;
     padding-bottom: 6px;
     padding-left: 4px;
-    color: #057005;
+    color: #60b48a;
     flex-grow: 0;
     flex-shrink: 0;
 }
